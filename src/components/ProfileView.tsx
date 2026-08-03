@@ -1,96 +1,105 @@
 import React, { useState } from 'react';
-import { User, Mail, GraduationCap, Building2, Moon, Sun, Smartphone, DownloadCloud, ShieldCheck, LogOut, Check } from 'lucide-react';
+import { User, Mail, GraduationCap, Building2, Moon, Sun, Smartphone, DownloadCloud, Check } from 'lucide-react';
 import { UserProfile } from '../data/mockData';
 
 interface ProfileViewProps {
   user: UserProfile;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
+  deferredPrompt?: any;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
   user,
   isDarkMode,
   onToggleDarkMode,
+  deferredPrompt
 }) => {
   const [pwaInstalled, setPwaInstalled] = useState(false);
 
-  const handleInstallPWA = () => {
-    setPwaInstalled(true);
-    alert('AIUB CS PWA app installed to your mobile home screen!');
+  const handleInstallPWA = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+      if (choiceResult.outcome === 'accepted') {
+        setPwaInstalled(true);
+      }
+    } else {
+      alert('To install AIUB CS PWA:\n• On Android/Chrome: Tap Chrome Menu (⋮) -> "Install app" or "Add to Home screen"\n• On iPhone/Safari: Tap Share icon (⎋) -> "Add to Home Screen"');
+    }
   };
 
   return (
-    <div className="pb-24 pt-2 space-y-5">
+    <div className="pb-24 pt-1 space-y-4">
       {/* User Header Profile Card */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm text-center space-y-3">
-        <div className="relative w-20 h-20 mx-auto">
+      <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs text-center space-y-2">
+        <div className="relative w-16 h-16 mx-auto">
           <img
             src={user.avatarUrl}
             alt={user.name}
-            className="w-20 h-20 rounded-full object-cover ring-4 ring-teal-500/30 shadow-md"
+            className="w-16 h-16 rounded-full object-cover ring-2 ring-emerald-500/30 shadow-xs"
           />
-          <div className="absolute bottom-0 right-0 bg-emerald-500 w-5 h-5 rounded-full border-2 border-white dark:border-slate-900" />
+          <div className="absolute bottom-0 right-0 bg-emerald-500 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900" />
         </div>
 
         <div>
-          <h2 className="text-lg font-black text-slate-900 dark:text-white">{user.name}</h2>
-          <p className="text-xs font-bold text-teal-600 dark:text-teal-400">{user.role}</p>
-          <p className="text-[11px] text-slate-400 font-mono mt-0.5">ID: {user.studentId}</p>
+          <h3 className="text-base font-black text-slate-900 dark:text-white">{user.name}</h3>
+          <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{user.role}</p>
+          <p className="text-[10px] text-slate-400 font-mono">ID: {user.studentId}</p>
         </div>
       </div>
 
       {/* Profile Details List */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
-        <div className="p-4 flex items-center space-x-3">
-          <GraduationCap className="w-5 h-5 text-slate-400" />
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
+        <div className="p-3.5 flex items-center space-x-3">
+          <GraduationCap className="w-4.5 h-4.5 text-slate-400" />
           <div>
-            <div className="text-[10px] uppercase font-bold text-slate-400">Department</div>
+            <div className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Department</div>
             <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{user.department}</div>
           </div>
         </div>
 
-        <div className="p-4 flex items-center space-x-3">
-          <Mail className="w-5 h-5 text-slate-400" />
+        <div className="p-3.5 flex items-center space-x-3">
+          <Mail className="w-4.5 h-4.5 text-slate-400" />
           <div>
-            <div className="text-[10px] uppercase font-bold text-slate-400">Student Email</div>
+            <div className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Student Email</div>
             <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{user.email}</div>
           </div>
         </div>
 
-        <div className="p-4 flex items-center space-x-3">
-          <Building2 className="w-5 h-5 text-slate-400" />
+        <div className="p-3.5 flex items-center space-x-3">
+          <Building2 className="w-4.5 h-4.5 text-slate-400" />
           <div>
-            <div className="text-[10px] uppercase font-bold text-slate-400">Institution</div>
+            <div className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Institution</div>
             <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">American International University-Bangladesh</div>
           </div>
         </div>
       </div>
 
       {/* App Preferences */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
         <div
           onClick={onToggleDarkMode}
-          className="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+          className="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
         >
           <div className="flex items-center space-x-3">
-            {isDarkMode ? <Moon className="w-5 h-5 text-indigo-400" /> : <Sun className="w-5 h-5 text-amber-500" />}
+            {isDarkMode ? <Moon className="w-4.5 h-4.5 text-indigo-400" /> : <Sun className="w-4.5 h-4.5 text-amber-500" />}
             <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Dark Mode</span>
           </div>
-          <div className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors ${isDarkMode ? 'bg-teal-600' : 'bg-slate-300'}`}>
-            <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${isDarkMode ? 'translate-x-5' : ''}`} />
+          <div className={`w-10 h-5.5 flex items-center rounded-full p-0.5 transition-colors ${isDarkMode ? 'bg-emerald-600' : 'bg-slate-300'}`}>
+            <div className={`bg-white w-4 h-4 rounded-full shadow-xs transform transition-transform ${isDarkMode ? 'translate-x-4.5' : ''}`} />
           </div>
         </div>
 
         <div
           onClick={handleInstallPWA}
-          className="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+          className="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
         >
           <div className="flex items-center space-x-3">
-            <Smartphone className="w-5 h-5 text-teal-500" />
+            <Smartphone className="w-4.5 h-4.5 text-emerald-600" />
             <div>
               <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Install PWA Mobile App</div>
-              <div className="text-[10px] text-slate-400">Add to home screen for offline use</div>
+              <div className="text-[10px] text-slate-400">Add to home screen for native offline access</div>
             </div>
           </div>
           {pwaInstalled ? (
@@ -98,7 +107,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <Check className="w-4 h-4" /> Installed
             </span>
           ) : (
-            <DownloadCloud className="w-5 h-5 text-teal-600" />
+            <DownloadCloud className="w-4.5 h-4.5 text-emerald-600" />
           )}
         </div>
       </div>

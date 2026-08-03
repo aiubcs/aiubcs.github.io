@@ -19,6 +19,19 @@ export function App() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSyllabus, setShowSyllabus] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
 
   const [savedMaterials, setSavedMaterials] = useState<MaterialItem[]>(
     MOCK_MATERIALS.filter(m => m.isBookmarked)
@@ -127,6 +140,7 @@ export function App() {
                   user={CURRENT_USER}
                   isDarkMode={isDarkMode}
                   onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+                  deferredPrompt={deferredPrompt}
                 />
               )}
             </>
