@@ -145,7 +145,7 @@ export const DocumentViewerModal: React.FC<DocumentViewerModalProps> = ({
           <div className="text-center space-y-1.5 pb-4 border-b border-slate-300 dark:border-slate-800">
             <div className="w-10 h-10 mx-auto rounded-full bg-white border border-slate-200 p-0.5 flex items-center justify-center mb-1">
               <img 
-                src="https://img.icons8.com/color/96/academic-cap.png" 
+                src="https://aiub.edu/Files/Templates/AIUBv3/assets/images/aiub-logo-white-border.svg" 
                 alt="AIUB Crest" 
                 className="w-7 h-7 object-contain"
               />

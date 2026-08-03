@@ -16,7 +16,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onOpenNotifications, onOpe
         <div className="flex items-center space-x-3 cursor-pointer">
           <div className="w-10 h-10 rounded-full bg-white border border-slate-200 dark:border-slate-700 p-0.5 shadow-sm flex items-center justify-center">
             <img 
-              src="https://img.icons8.com/color/96/academic-cap.png" 
+              src="https://aiub.edu/Files/Templates/AIUBv3/assets/images/aiub-logo-white-border.svg" 
               alt="AIUB Logo" 
               className="w-7 h-7 object-contain"
             />
