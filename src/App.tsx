@@ -114,6 +114,7 @@ export function App() {
               {activeTab === 'home' && (
                 <HomeView
                   user={CURRENT_USER}
+                  courses={courses}
                   materials={materials}
                   onSelectCourse={handleSelectCourse}
                   onSelectMaterial={(material) => setSelectedMaterial(material)}

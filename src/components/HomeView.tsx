@@ -20,6 +20,7 @@ import { COURSES, Course, MaterialItem, UserProfile } from '../data/mockData';
 
 interface HomeViewProps {
   user: UserProfile;
+  courses: Course[];
   materials: MaterialItem[];
   onSelectCourse: (course: Course) => void;
   onSelectMaterial: (material: MaterialItem) => void;
@@ -29,6 +30,7 @@ interface HomeViewProps {
 
 export const HomeView: React.FC<HomeViewProps> = ({
   user,
+  courses = COURSES,
   materials,
   onSelectCourse,
   onSelectMaterial,
@@ -91,7 +93,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <BookOpen className="w-4 h-4" />
           </div>
           <div>
-            <div className="font-black text-slate-900 dark:text-white text-sm leading-tight">{COURSES.length}</div>
+            <div className="font-black text-slate-900 dark:text-white text-sm leading-tight">{courses.length}</div>
             <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Courses</div>
           </div>
         </div>
@@ -130,7 +132,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-1">
-          {COURSES.slice(0, 5).map((course) => {
+          {courses.slice(0, 6).map((course) => {
             const percent = Math.round((course.completedTopics / course.totalTopics) * 100);
             return (
               <div
