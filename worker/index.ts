@@ -9,7 +9,12 @@ export interface Env {
 
 const app = new Hono<{ Bindings: Env }>();
 
-app.use('*', cors());
+// Enable CORS for all origins (GitHub Pages, localhost, mobile PWA)
+app.use('*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+}));
 
 // Health Check API
 app.get('/api/health', (c) => {
@@ -21,8 +26,15 @@ app.get('/api/courses', async (c) => {
   try {
     const { results } = await c.env.DB.prepare('SELECT * FROM courses ORDER BY code ASC').all();
     const courses = results.map((row: any) => ({
-      ...row,
+      id: row.id,
+      code: row.code,
+      title: row.title,
+      category: row.category,
+      credits: row.credits,
       ongoing: Boolean(row.ongoing),
+      completedTopics: Number(row.completed_topics) || 0,
+      totalTopics: Number(row.total_topics) || 14,
+      iconType: row.icon_type || 'code',
       syllabus: JSON.parse(row.syllabus_json || '[]')
     }));
     return c.json({ success: true, data: courses });
@@ -41,8 +53,15 @@ app.get('/api/courses/:id', async (c) => {
     return c.json({
       success: true,
       data: {
-        ...course,
+        id: course.id,
+        code: course.code,
+        title: course.title,
+        category: course.category,
+        credits: course.credits,
         ongoing: Boolean(course.ongoing),
+        completedTopics: Number(course.completed_topics) || 0,
+        totalTopics: Number(course.total_topics) || 14,
+        iconType: course.icon_type || 'code',
         syllabus: JSON.parse(course.syllabus_json || '[]')
       }
     });
@@ -74,7 +93,7 @@ app.get('/api/materials', async (c) => {
     query += ' ORDER BY id ASC';
 
     const { results } = await c.env.DB.prepare(query).bind(...params).all();
-    const materials = results.map((row: any) => ({
+    const materials = (results || []).map((row: any) => ({
       id: row.id,
       courseId: row.course_id,
       courseCode: row.course_code,
@@ -87,7 +106,7 @@ app.get('/api/materials', async (c) => {
       badges: JSON.parse(row.badges_json || '[]'),
       isBookmarked: Boolean(row.is_bookmarked),
       isDownloaded: Boolean(row.is_downloaded),
-      pagesCount: row.pages_count,
+      pagesCount: row.pages_count || 1,
       r2Key: row.r2_key,
       documentContent: row.document_content_json ? JSON.parse(row.document_content_json) : null
     }));
@@ -138,7 +157,7 @@ app.post('/api/materials/upload', async (c) => {
       return c.json({ success: false, error: 'Missing required fields' }, 400);
     }
 
-    const r2Key = `${courseCode.toLowerCase()}/${Date.now()}-${file.name}`;
+    const r2Key = `${courseCode.toLowerCase().replace(/\s+/g, '')}/${Date.now()}-${file.name}`;
     await c.env.BUCKET.put(r2Key, await file.arrayBuffer(), {
       httpMetadata: { contentType: file.type }
     });
@@ -171,7 +190,7 @@ app.post('/api/materials/upload', async (c) => {
 app.get('/api/announcements', async (c) => {
   try {
     const { results } = await c.env.DB.prepare('SELECT * FROM announcements ORDER BY date DESC').all();
-    return c.json({ success: true, data: results });
+    return c.json({ success: true, data: results || [] });
   } catch (err: any) {
     return c.json({ success: false, error: err.message }, 500);
   }

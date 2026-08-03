@@ -10,7 +10,18 @@ export async function fetchCoursesFromCloudflare(): Promise<Course[]> {
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
     const json = await res.json();
     if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-      return json.data;
+      return json.data.map((c: any) => ({
+        id: c.id,
+        code: c.code,
+        title: c.title,
+        category: c.category || 'Core CS',
+        credits: Number(c.credits) || 3,
+        ongoing: Boolean(c.ongoing),
+        completedTopics: Number(c.completedTopics ?? c.completed_topics) || 0,
+        totalTopics: Number(c.totalTopics ?? c.total_topics) || 14,
+        iconType: c.iconType || c.icon_type || 'code',
+        syllabus: Array.isArray(c.syllabus) ? c.syllabus : []
+      }));
     }
   } catch (err) {
     console.warn('Falling back to local PWA offline courses:', err);
