@@ -6,14 +6,21 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cf:dev": "wrangler dev worker/index.ts",
+    "cf:deploy": "npm run build && wrangler deploy",
+    "cf:d1:create": "wrangler d1 create aiubcs-db",
+    "cf:d1:init": "wrangler d1 execute aiubcs-db --local --file=./schema.sql",
+    "cf:r2:create": "wrangler r2 bucket create aiubcs-materials"
   },
   "dependencies": {
+    "hono": "^4.0.0",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240208.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
@@ -21,6 +28,7 @@
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2",
-    "vite": "^5.1.6"
+    "vite": "^5.1.6",
+    "wrangler": "^3.30.0"
   }
 }
