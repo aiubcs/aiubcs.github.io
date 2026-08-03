@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aiubcs-pwa-v3';
+const CACHE_NAME = 'aiubcs-pwa-v4';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -40,6 +40,10 @@ self.addEventListener('activate', (event) => {
 // Network-First strategy for fresh content with offline cache fallback
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+
+  // Only handle http(s):// requests — ignore chrome-extension://,
+  // data:, devtools, etc. so cache.put never rejects on unsupported schemes
+  if (!event.request.url.startsWith('http')) return;
   
   // Skip caching Cloudflare API calls directly
   if (event.request.url.includes('workers.dev') || event.request.url.includes('/api/')) {
@@ -55,7 +59,7 @@ self.addEventListener('fetch', (event) => {
         if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
+            cache.put(event.request, responseToCache).catch(() => {});
           });
         }
         return networkResponse;
