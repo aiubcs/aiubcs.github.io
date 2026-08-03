@@ -74,9 +74,9 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-app bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors selection:bg-emerald-500 selection:text-white">
       {/* Mobile Frame Container */}
-      <div className="max-w-md mx-auto w-full min-h-screen bg-white dark:bg-slate-900 shadow-2xl relative flex flex-col">
+      <div className="max-w-md mx-auto w-full min-h-app bg-white dark:bg-slate-900 shadow-2xl relative flex flex-col">
         {/* Navbar */}
         <Navbar
           user={CURRENT_USER}

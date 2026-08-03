@@ -10,7 +10,7 @@ interface SyllabusModalProps {
 export const SyllabusModal: React.FC<SyllabusModalProps> = ({ course, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 space-y-5 animate-in slide-in-from-bottom duration-200">
+      <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 pl-[calc(var(--safe-left)+1.5rem)] pr-[calc(var(--safe-right)+1.5rem)] pb-[calc(var(--safe-bottom)+1.5rem)] space-y-5 animate-in slide-in-from-bottom duration-200">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center space-x-2.5">
             <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-950/80 text-teal-600 dark:text-teal-400 flex items-center justify-center">

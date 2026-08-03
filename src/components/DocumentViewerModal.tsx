@@ -99,7 +99,7 @@ export const DocumentViewerModal: React.FC<DocumentViewerModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-[#0f172a] flex flex-col justify-between text-slate-100 overflow-hidden font-sans">
       {/* 1. Top Navigation Bar */}
-      <div className="bg-[#0f172a]/95 backdrop-blur-md border-b border-slate-800 px-4 py-2.5 flex items-center justify-between z-10">
+      <div className="bg-[#0f172a]/95 backdrop-blur-md border-b border-slate-800 px-4 pl-[calc(var(--safe-left)+1rem)] pr-[calc(var(--safe-right)+1rem)] pt-2.5 pt-[calc(var(--safe-top)+0.625rem)] pb-2.5 flex items-center justify-between z-10">
         <div className="flex items-center space-x-2.5">
           <button
             onClick={onClose}
@@ -192,7 +192,7 @@ export const DocumentViewerModal: React.FC<DocumentViewerModalProps> = ({
 
       {/* 3. Horizontal Page Thumbnail Carousel Strip (Screen 3 match) */}
       {showThumbnails && (
-        <div className="bg-[#0f172a] border-t border-slate-800 px-4 py-2 flex items-center space-x-2 overflow-x-auto no-scrollbar">
+        <div className="bg-[#0f172a] border-t border-slate-800 px-4 pl-[calc(var(--safe-left)+1rem)] pr-[calc(var(--safe-right)+1rem)] py-2 flex items-center space-x-2 overflow-x-auto no-scrollbar">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((pNum) => {
             const isSelectedPage = currentPage === pNum;
             return (
@@ -214,7 +214,7 @@ export const DocumentViewerModal: React.FC<DocumentViewerModalProps> = ({
       )}
 
       {/* 4. Bottom Document Toolbar (Screen 3 match) */}
-      <div className="bg-[#0f172a] border-t border-slate-800 px-4 py-2.5 flex items-center justify-around text-slate-400 text-[10px]">
+      <div className="bg-[#0f172a] border-t border-slate-800 px-4 pl-[calc(var(--safe-left)+1rem)] pr-[calc(var(--safe-right)+1rem)] py-2.5 pb-[calc(var(--safe-bottom)+0.625rem)] flex items-center justify-around text-slate-400 text-[10px]">
         <button
           onClick={() => setShowContents(!showContents)}
           className="flex flex-col items-center space-y-1 hover:text-white transition-colors"
@@ -262,7 +262,7 @@ export const DocumentViewerModal: React.FC<DocumentViewerModalProps> = ({
 
       {/* Table of Contents Drawer */}
       {showContents && (
-        <div className="absolute inset-x-0 bottom-14 bg-slate-900 border-t border-slate-800 p-4 space-y-2 z-30 rounded-t-2xl shadow-2xl">
+        <div className="absolute inset-x-0 bottom-14 bottom-[calc(var(--safe-bottom)+3.5rem)] bg-slate-900 border-t border-slate-800 p-4 pb-[calc(var(--safe-bottom)+1rem)] space-y-2 z-30 rounded-t-2xl shadow-2xl">
           <div className="flex justify-between items-center pb-2 border-b border-slate-800">
             <h4 className="text-xs font-bold text-white">Table of Contents</h4>
             <button onClick={() => setShowContents(false)} className="text-xs text-slate-400">Close</button>

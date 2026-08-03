@@ -10,7 +10,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ user, onOpenNotifications, onOpenProfile }) => {
   return (
-    <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 py-3">
+    <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 pl-[calc(var(--safe-left)+1rem)] pr-[calc(var(--safe-right)+1rem)] pt-3 pt-[calc(var(--safe-top)+0.75rem)] pb-3">
       <div className="flex items-center justify-between">
         {/* Left: AIUB CS Logo & Subtitle */}
         <div className="flex items-center space-x-3 cursor-pointer">

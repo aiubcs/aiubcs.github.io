@@ -269,7 +269,7 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
       </div>
 
       {/* 7. Floating Action Button: Browse by Topic */}
-      <div className="fixed bottom-20 left-0 right-0 z-30 flex justify-center pointer-events-none">
+      <div className="fixed bottom-20 bottom-[calc(var(--safe-bottom)+5rem)] left-0 right-0 z-30 flex justify-center pointer-events-none">
         <button
           onClick={onOpenSyllabus}
           className="pointer-events-auto bg-[#043927] hover:bg-[#075239] text-white text-xs font-bold px-5 py-2.5 rounded-full shadow-xl flex items-center space-x-2 border border-emerald-600/30 transition-all hover:scale-105"
