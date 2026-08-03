@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, 
   Bookmark, 
@@ -9,7 +9,8 @@ import {
   SlidersHorizontal,
   Grid2X2
 } from 'lucide-react';
-import { Course, MaterialItem, MOCK_MATERIALS } from '../data/mockData';
+import { Course, MaterialItem } from '../data/mockData';
+import { fetchMaterialsFromCloudflare } from '../services/api';
 
 interface MaterialsViewProps {
   course: Course;
@@ -27,9 +28,21 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
   const [activeCategory, setActiveCategory] = useState<'Mid' | 'Final' | 'Notes' | 'Textbook' | 'All'>('Mid');
   const [selectedYear, setSelectedYear] = useState('All Years');
   const [sortBy, setSortBy] = useState('Latest');
-  const [materials, setMaterials] = useState<MaterialItem[]>(MOCK_MATERIALS);
+  const [materials, setMaterials] = useState<MaterialItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState('');
   const [showSearchInput, setShowSearchInput] = useState(false);
+
+  // Fetch materials for this course from Cloudflare D1
+  useEffect(() => {
+    setIsLoading(true);
+    fetchMaterialsFromCloudflare(course.id)
+      .then(data => {
+        setMaterials(data);
+      })
+      .catch(() => setMaterials([]))
+      .finally(() => setIsLoading(false));
+  }, [course.id]);
 
   const categories: Array<'Mid' | 'Final' | 'Notes' | 'Textbook' | 'All'> = ['Mid', 'Final', 'Notes', 'Textbook', 'All'];
 
@@ -185,57 +198,74 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
 
       {/* 6. Materials List */}
       <div className="space-y-2.5">
-        {filteredMaterials.map((item, index) => {
-          const isSelected = index === 0; // Item 1 selected highlight as shown in Screenshot 2
-          return (
-            <div
-              key={item.id}
-              onClick={() => onSelectMaterial(item)}
-              className={`p-3.5 rounded-2xl transition-all cursor-pointer flex items-center justify-between group ${
-                isSelected
-                  ? 'bg-blue-50/20 dark:bg-slate-900 border-2 border-blue-500 shadow-md'
-                  : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                {getFileSquareIcon(item.fileType)}
-                <div className="space-y-1">
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors leading-snug">
-                    {item.title}
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-medium">
-                    {item.addedTime} • {item.size}
-                  </p>
-                  {/* Pastel Badges */}
-                  <div className="flex items-center space-x-1.5 pt-0.5">
-                    {item.badges.map((badge, idx) => (
-                      <span
-                        key={idx}
-                        className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-                      >
-                        {badge}
-                      </span>
-                    ))}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-16 space-y-3">
+            <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs font-medium text-slate-500">Loading materials...</p>
+          </div>
+        ) : filteredMaterials.length === 0 ? (
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center space-y-2">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto">
+              <Database className="w-6 h-6 text-slate-400" />
+            </div>
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-300">No materials yet</p>
+            <p className="text-[10px] text-slate-400 leading-relaxed">
+              No {activeCategory === 'All' ? '' : activeCategory + ' '}materials have been uploaded for {course.code} yet.
+            </p>
+          </div>
+        ) : (
+          filteredMaterials.map((item, index) => {
+            const isSelected = index === 0;
+            return (
+              <div
+                key={item.id}
+                onClick={() => onSelectMaterial(item)}
+                className={`p-3.5 rounded-2xl transition-all cursor-pointer flex items-center justify-between group ${
+                  isSelected
+                    ? 'bg-blue-50/20 dark:bg-slate-900 border-2 border-blue-500 shadow-md'
+                    : 'bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  {getFileSquareIcon(item.fileType)}
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors leading-snug">
+                      {item.title}
+                    </h4>
+                    <p className="text-[10px] text-slate-400 font-medium">
+                      {item.addedTime} • {item.size}
+                    </p>
+                    {/* Pastel Badges */}
+                    <div className="flex items-center space-x-1.5 pt-0.5">
+                      {item.badges.map((badge, idx) => (
+                        <span
+                          key={idx}
+                          className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                        >
+                          {badge}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center space-x-1">
-                <button
-                  onClick={(e) => toggleBookmark(item.id, e)}
-                  className={`p-1.5 rounded-lg transition-colors ${
-                    item.isBookmarked ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 hover:text-slate-600'
-                  }`}
-                >
-                  <Bookmark className={`w-4 h-4 ${item.isBookmarked ? 'fill-current' : ''}`} />
-                </button>
-                <button className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg">
-                  <MoreVertical className="w-4 h-4" />
-                </button>
+                <div className="flex items-center space-x-1">
+                  <button
+                    onClick={(e) => toggleBookmark(item.id, e)}
+                    className={`p-1.5 rounded-lg transition-colors ${
+                      item.isBookmarked ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 hover:text-slate-600'
+                    }`}
+                  >
+                    <Bookmark className={`w-4 h-4 ${item.isBookmarked ? 'fill-current' : ''}`} />
+                  </button>
+                  <button className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg">
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
 
       {/* 7. Floating Action Button: Browse by Topic */}

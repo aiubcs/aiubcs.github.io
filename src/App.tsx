@@ -20,7 +20,6 @@ export function App() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSyllabus, setShowSyllabus] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   const [courses, setCourses] = useState<Course[]>(COURSES);
   const [materials, setMaterials] = useState<MaterialItem[]>([]);
@@ -34,18 +33,6 @@ export function App() {
     fetchMaterialsFromCloudflare().then(data => {
       if (data) setMaterials(data);
     });
-  }, []);
-
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
   }, []);
 
   useEffect(() => {
@@ -155,7 +142,6 @@ export function App() {
                   user={CURRENT_USER}
                   isDarkMode={isDarkMode}
                   onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-                  deferredPrompt={deferredPrompt}
                 />
               )}
             </>

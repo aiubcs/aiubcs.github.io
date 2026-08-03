@@ -1,8 +1,7 @@
 import { Course, MaterialItem, COURSES, MOCK_MATERIALS } from '../data/mockData';
 
-const API_BASE = window.location.hostname.includes('workers.dev') || window.location.hostname.includes('github.io')
-  ? 'https://aiubcs-api.tanvirrahman-b16.workers.dev/api'
-  : '/api';
+// Always use the live Cloudflare Worker API — no local API server exists.
+const API_BASE = 'https://aiubcs-api.tanvirrahman-b16.workers.dev/api';
 
 export async function fetchCoursesFromCloudflare(): Promise<Course[]> {
   try {

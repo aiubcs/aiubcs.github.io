@@ -41,12 +41,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   const quickAccessGrid = [
     { label: 'All Courses', icon: BookOpen, tab: 'courses' },
-    { label: 'Mid Qs', icon: FileText, course: COURSES[0] },
-    { label: 'Final Qs', icon: FileCheck2, course: COURSES[0] },
-    { label: 'Notes', icon: BookMarked, course: COURSES[0] },
-    { label: 'Textbooks', icon: Book, course: COURSES[0] },
-    { label: 'Labs', icon: FlaskConical, course: COURSES[0] },
-    { label: 'Past Papers', icon: FileCode2, course: COURSES[0] },
+    { label: 'Mid Qs', icon: FileText, tab: 'courses' },
+    { label: 'Final Qs', icon: FileCheck2, tab: 'courses' },
+    { label: 'Notes', icon: BookMarked, tab: 'courses' },
+    { label: 'Textbooks', icon: Book, tab: 'courses' },
+    { label: 'Labs', icon: FlaskConical, tab: 'courses' },
+    { label: 'Past Papers', icon: FileCode2, tab: 'courses' },
     { label: 'Favorites', icon: Heart, tab: 'saved' },
   ];
 
@@ -186,11 +186,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <button
                 key={idx}
                 onClick={() => {
-                  if (item.tab) {
-                    onNavigateTab(item.tab);
-                  } else if (item.course) {
-                    onSelectCourse(item.course);
-                  }
+                  onNavigateTab(item.tab);
                 }}
                 className="flex flex-col items-center p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500/50 hover:shadow-sm transition-all group"
               >
