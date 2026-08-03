@@ -13,12 +13,14 @@ import {
   Database,
   Code2,
   Users,
-  Building2
+  Building2,
+  FolderOpen
 } from 'lucide-react';
-import { COURSES, MOCK_MATERIALS, Course, MaterialItem, UserProfile } from '../data/mockData';
+import { COURSES, Course, MaterialItem, UserProfile } from '../data/mockData';
 
 interface HomeViewProps {
   user: UserProfile;
+  materials: MaterialItem[];
   onSelectCourse: (course: Course) => void;
   onSelectMaterial: (material: MaterialItem) => void;
   onNavigateTab: (tab: any) => void;
@@ -27,6 +29,7 @@ interface HomeViewProps {
 
 export const HomeView: React.FC<HomeViewProps> = ({
   user,
+  materials,
   onSelectCourse,
   onSelectMaterial,
   onNavigateTab,
@@ -35,21 +38,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   const quickAccessGrid = [
-    { label: 'All Courses', icon: BookOpen, color: 'text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-200', tab: 'courses' },
-    { label: 'Mid Qs', icon: FileText, color: 'text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-200', course: COURSES[0] },
-    { label: 'Final Qs', icon: FileCheck2, color: 'text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-200', course: COURSES[0] },
-    { label: 'Notes', icon: BookMarked, color: 'text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-200', course: COURSES[0] },
-    { label: 'Textbooks', icon: Book, color: 'text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-200', course: COURSES[0] },
-    { label: 'Labs', icon: FlaskConical, color: 'text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-200', course: COURSES[0] },
-    { label: 'Past Papers', icon: FileCode2, color: 'text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-200', course: COURSES[0] },
-    { label: 'Favorites', icon: Heart, color: 'text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-200', tab: 'saved' },
+    { label: 'All Courses', icon: BookOpen, tab: 'courses' },
+    { label: 'Mid Qs', icon: FileText, course: COURSES[0] },
+    { label: 'Final Qs', icon: FileCheck2, course: COURSES[0] },
+    { label: 'Notes', icon: BookMarked, course: COURSES[0] },
+    { label: 'Textbooks', icon: Book, course: COURSES[0] },
+    { label: 'Labs', icon: FlaskConical, course: COURSES[0] },
+    { label: 'Past Papers', icon: FileCode2, course: COURSES[0] },
+    { label: 'Favorites', icon: Heart, tab: 'saved' },
   ];
+
+  const recentMaterials = materials.slice(0, 3);
 
   return (
     <div className="pb-24 pt-1 space-y-5">
-      {/* 1. Hero Welcome Card with Deep Forest Green Gradient & Architectural Building Pattern */}
+      {/* 1. Hero Welcome Card */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#043927] via-[#054a37] to-[#09523a] text-white p-5 shadow-lg border border-emerald-900/30">
-        {/* Subtle Architectural Building Line Art Vector on right */}
         <div className="absolute right-0 bottom-0 top-0 w-2/5 opacity-15 pointer-events-none flex items-end justify-end pr-2 pb-1">
           <Building2 className="w-40 h-40 stroke-[1]" />
         </div>
@@ -87,7 +91,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <BookOpen className="w-4 h-4" />
           </div>
           <div>
-            <div className="font-black text-slate-900 dark:text-white text-sm leading-tight">124+</div>
+            <div className="font-black text-slate-900 dark:text-white text-sm leading-tight">{COURSES.length}</div>
             <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Courses</div>
           </div>
         </div>
@@ -97,7 +101,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <FileText className="w-4 h-4" />
           </div>
           <div>
-            <div className="font-black text-slate-900 dark:text-white text-sm leading-tight">3.2K+</div>
+            <div className="font-black text-slate-900 dark:text-white text-sm leading-tight">{materials.length}</div>
             <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Materials</div>
           </div>
         </div>
@@ -107,8 +111,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <Users className="w-4 h-4" />
           </div>
           <div>
-            <div className="font-black text-slate-900 dark:text-white text-sm leading-tight">12.5K+</div>
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Students</div>
+            <div className="font-black text-slate-900 dark:text-white text-sm leading-tight">AIUB</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Community</div>
           </div>
         </div>
       </div>
@@ -126,7 +130,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-1">
-          {COURSES.map((course) => {
+          {COURSES.slice(0, 5).map((course) => {
             const percent = Math.round((course.completedTopics / course.totalTopics) * 100);
             return (
               <div
@@ -205,32 +209,43 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Recently Added</h3>
           <button
-            onClick={() => onSelectCourse(COURSES[0])}
+            onClick={() => onNavigateTab('courses')}
             className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
           >
             View All
           </button>
         </div>
 
-        <div
-          onClick={() => onSelectMaterial(MOCK_MATERIALS[0])}
-          className="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500/50 transition-all cursor-pointer group"
-        >
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-red-500 text-white font-black text-[10px] flex items-center justify-center shadow-xs">
-              PDF
-            </div>
-            <div>
-              <h4 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 transition-colors">
-                DBMS Midterm 2024.pdf
-              </h4>
-              <p className="text-[10px] text-slate-400 font-medium">
-                CSE 314 • 1.8 MB
-              </p>
-            </div>
+        {recentMaterials.length === 0 ? (
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center space-y-2">
+            <FolderOpen className="w-8 h-8 text-slate-300 mx-auto" />
+            <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">No materials uploaded yet</p>
+            <p className="text-[10px] text-slate-400">Upload PDF files via Cloudflare API or select a course to contribute.</p>
           </div>
-          <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-transform group-hover:translate-x-0.5" />
-        </div>
+        ) : (
+          recentMaterials.map((mat) => (
+            <div
+              key={mat.id}
+              onClick={() => onSelectMaterial(mat)}
+              className="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-500/50 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-red-500 text-white font-black text-[10px] flex items-center justify-center shadow-xs">
+                  {mat.fileType.toUpperCase()}
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 transition-colors">
+                    {mat.title}
+                  </h4>
+                  <p className="text-[10px] text-slate-400 font-medium">
+                    {mat.courseCode} • {mat.size}
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-transform group-hover:translate-x-0.5" />
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

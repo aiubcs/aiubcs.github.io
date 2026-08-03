@@ -10,7 +10,8 @@ import { ProfileView } from './components/ProfileView';
 import { DocumentViewerModal } from './components/DocumentViewerModal';
 import { SyllabusModal } from './components/SyllabusModal';
 import { NotificationModal } from './components/NotificationModal';
-import { CURRENT_USER, COURSES, MOCK_MATERIALS, Course, MaterialItem } from './data/mockData';
+import { CURRENT_USER, COURSES, Course, MaterialItem } from './data/mockData';
+import { fetchMaterialsFromCloudflare } from './services/api';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
@@ -20,6 +21,16 @@ export function App() {
   const [showSyllabus, setShowSyllabus] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  const [materials, setMaterials] = useState<MaterialItem[]>([]);
+  const [savedMaterials, setSavedMaterials] = useState<MaterialItem[]>([]);
+  const [downloadedMaterials, setDownloadedMaterials] = useState<MaterialItem[]>([]);
+
+  useEffect(() => {
+    fetchMaterialsFromCloudflare().then(data => {
+      setMaterials(data);
+    });
+  }, []);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -32,14 +43,6 @@ export function App() {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
-
-  const [savedMaterials, setSavedMaterials] = useState<MaterialItem[]>(
-    MOCK_MATERIALS.filter(m => m.isBookmarked)
-  );
-
-  const [downloadedMaterials, setDownloadedMaterials] = useState<MaterialItem[]>(
-    MOCK_MATERIALS.filter(m => m.isDownloaded)
-  );
 
   useEffect(() => {
     if (isDarkMode) {
@@ -80,7 +83,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors selection:bg-teal-500 selection:text-white">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors selection:bg-emerald-500 selection:text-white">
       {/* Mobile Frame Container */}
       <div className="max-w-md mx-auto w-full min-h-screen bg-white dark:bg-slate-900 shadow-2xl relative flex flex-col">
         {/* Navbar */}
@@ -104,6 +107,7 @@ export function App() {
               {activeTab === 'home' && (
                 <HomeView
                   user={CURRENT_USER}
+                  materials={materials}
                   onSelectCourse={handleSelectCourse}
                   onSelectMaterial={(material) => setSelectedMaterial(material)}
                   onNavigateTab={(tab) => {
