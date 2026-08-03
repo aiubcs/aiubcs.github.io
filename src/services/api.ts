@@ -1,6 +1,8 @@
 import { Course, MaterialItem, COURSES, MOCK_MATERIALS } from '../data/mockData';
 
-const API_BASE = '/api';
+const API_BASE = window.location.hostname.includes('workers.dev') || window.location.hostname.includes('github.io')
+  ? 'https://aiubcs-api.tanvirrahman-b16.workers.dev/api'
+  : '/api';
 
 export async function fetchCoursesFromCloudflare(): Promise<Course[]> {
   try {
@@ -30,7 +32,7 @@ export async function fetchMaterialsFromCloudflare(courseId?: string, category?:
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
     const json = await res.json();
-    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+    if (json.success && Array.isArray(json.data)) {
       return json.data;
     }
   } catch (err) {
