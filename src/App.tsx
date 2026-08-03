@@ -10,6 +10,8 @@ import { ProfileView } from './components/ProfileView';
 import { DocumentViewerModal } from './components/DocumentViewerModal';
 import { SyllabusModal } from './components/SyllabusModal';
 import { NotificationModal } from './components/NotificationModal';
+import { AdminLogin } from './components/AdminLogin';
+import { AdminView } from './components/AdminView';
 import { CURRENT_USER, COURSES, Course, MaterialItem } from './data/mockData';
 import { fetchMaterialsFromCloudflare, fetchCoursesFromCloudflare } from './services/api';
 
@@ -21,18 +23,30 @@ export function App() {
   const [showSyllabus, setShowSyllabus] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [adminToken, setAdminToken] = useState<string | null>(
+    localStorage.getItem('aiubcs_admin_token')
+  );
+  const [adminUsername, setAdminUsername] = useState<string>(
+    localStorage.getItem('aiubcs_admin_username') || ''
+  );
+
   const [courses, setCourses] = useState<Course[]>(COURSES);
   const [materials, setMaterials] = useState<MaterialItem[]>([]);
   const [savedMaterials, setSavedMaterials] = useState<MaterialItem[]>([]);
   const [downloadedMaterials, setDownloadedMaterials] = useState<MaterialItem[]>([]);
 
-  useEffect(() => {
+  const refreshData = () => {
     fetchCoursesFromCloudflare().then(data => {
       if (data && data.length > 0) setCourses(data);
     });
     fetchMaterialsFromCloudflare().then(data => {
       if (data) setMaterials(data);
     });
+  };
+
+  useEffect(() => {
+    refreshData();
   }, []);
 
   useEffect(() => {
@@ -142,6 +156,7 @@ export function App() {
                   user={CURRENT_USER}
                   isDarkMode={isDarkMode}
                   onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+                  onOpenAdmin={() => setShowAdmin(true)}
                 />
               )}
             </>
@@ -181,6 +196,37 @@ export function App() {
         <NotificationModal
           onClose={() => setShowNotifications(false)}
         />
+      )}
+
+      {/* Admin Panel (full-screen overlay) */}
+      {showAdmin && (
+        <div className="fixed inset-0 z-50 bg-slate-100 dark:bg-slate-950 overflow-y-auto">
+          {adminToken ? (
+            <AdminView
+              token={adminToken}
+              username={adminUsername}
+              onBack={() => setShowAdmin(false)}
+              onLoggedOut={() => {
+                localStorage.removeItem('aiubcs_admin_token');
+                localStorage.removeItem('aiubcs_admin_username');
+                setAdminToken(null);
+                setAdminUsername('');
+                setShowAdmin(false);
+                refreshData();
+              }}
+            />
+          ) : (
+            <AdminLogin
+              onLogin={(token, username) => {
+                localStorage.setItem('aiubcs_admin_token', token);
+                localStorage.setItem('aiubcs_admin_username', username);
+                setAdminToken(token);
+                setAdminUsername(username);
+              }}
+              onBack={() => setShowAdmin(false)}
+            />
+          )}
+        </div>
       )}
     </div>
   );

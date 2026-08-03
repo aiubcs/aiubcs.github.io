@@ -43,6 +43,21 @@ CREATE TABLE announcements (
   unread INTEGER DEFAULT 1
 );
 
+-- Admin authentication (NOT dropped on re-run, so admin accounts survive schema re-init)
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  token TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  expires_at INTEGER NOT NULL,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
 -- Seed All Official 96 AIUB CS Courses into Cloudflare D1
 INSERT INTO courses (id, code, title, category, credits, ongoing, completed_topics, total_topics, icon_type, syllabus_json) VALUES
 ('csc-1101', 'CSC 1101', 'Introduction to Computer Studies', 'Core CS', 3, 0, 0, 10, 'book', '["Computer Organization", "Operating System Basics", "Binary Arithmetic", "Software Systems"]'),

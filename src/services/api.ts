@@ -51,7 +51,7 @@ export async function fetchMaterialsFromCloudflare(courseId?: string, category?:
   return MOCK_MATERIALS;
 }
 
-export async function uploadMaterialToCloudflareR2(file: File, courseCode: string, title: string, category: string): Promise<boolean> {
+export async function uploadMaterialToCloudflareR2(file: File, courseCode: string, title: string, category: string, token?: string): Promise<boolean> {
   try {
     const formData = new FormData();
     formData.append('file', file);
@@ -59,14 +59,165 @@ export async function uploadMaterialToCloudflareR2(file: File, courseCode: strin
     formData.append('title', title);
     formData.append('category', category);
 
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
     const res = await fetch(`${API_BASE}/materials/upload`, {
       method: 'POST',
+      headers,
       body: formData,
     });
     const json: any = await res.json();
     return Boolean(json && json.success);
   } catch (err) {
     console.error('Failed to upload to Cloudflare R2:', err);
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Admin auth + panel API (token-based)
+// ---------------------------------------------------------------------------
+
+const ADMIN_TOKEN_KEY = 'aiubcs_admin_token';
+const ADMIN_USERNAME_KEY = 'aiubcs_admin_username';
+
+export function getAdminToken(): string | null {
+  return localStorage.getItem(ADMIN_TOKEN_KEY);
+}
+
+export function getAdminUsername(): string | null {
+  return localStorage.getItem(ADMIN_USERNAME_KEY);
+}
+
+export function setAdminSession(token: string, username: string): void {
+  localStorage.setItem(ADMIN_TOKEN_KEY, token);
+  localStorage.setItem(ADMIN_USERNAME_KEY, username);
+}
+
+export function clearAdminSession(): void {
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+  localStorage.removeItem(ADMIN_USERNAME_KEY);
+}
+
+async function adminFetch(path: string, token: string, init?: RequestInit): Promise<any> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...(init?.headers || {}),
+    },
+  });
+  return res.json();
+}
+
+export async function loginAdmin(username: string, password: string): Promise<{ token: string; username: string } | null> {
+  try {
+    const res = await fetch(`${API_BASE}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    const json: any = await res.json();
+    if (res.ok && json?.success && json?.data?.token) {
+      return { token: json.data.token, username: json.data.username };
+    }
+    return null;
+  } catch (err) {
+    console.error('Login failed:', err);
+    return null;
+  }
+}
+
+export async function logoutAdmin(token: string): Promise<void> {
+  try {
+    await fetch(`${API_BASE}/admin/logout`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch (err) {
+    console.warn('Logout request failed:', err);
+  }
+}
+
+export async function getAdminMe(token: string): Promise<{ userId: number; username: string } | null> {
+  try {
+    const res = await fetch(`${API_BASE}/admin/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const json: any = await res.json();
+    if (res.ok && json?.success && json?.data) return json.data;
+    return null;
+  } catch (err) {
+    return null;
+  }
+}
+
+export async function fetchAnnouncements(): Promise<any[]> {
+  try {
+    const res = await fetch(`${API_BASE}/announcements`);
+    const json: any = await res.json();
+    return json?.success && Array.isArray(json.data) ? json.data : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+export async function createAnnouncement(token: string, data: { title: string; desc: string; date?: string }): Promise<boolean> {
+  try {
+    const json = await adminFetch('/admin/announcements', token, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return Boolean(json && json.success);
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function updateAnnouncement(token: string, id: string, data: { title: string; desc: string; date?: string; unread?: boolean }): Promise<boolean> {
+  try {
+    const json = await adminFetch(`/admin/announcements/${id}`, token, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return Boolean(json && json.success);
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function deleteAnnouncement(token: string, id: string): Promise<boolean> {
+  try {
+    const json = await adminFetch(`/admin/announcements/${id}`, token, {
+      method: 'DELETE',
+    });
+    return Boolean(json && json.success);
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function updateCourse(token: string, id: string, patch: { ongoing?: boolean; completedTopics?: number }): Promise<boolean> {
+  try {
+    const json = await adminFetch(`/admin/courses/${id}`, token, {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    });
+    return Boolean(json && json.success);
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function deleteMaterial(token: string, id: string): Promise<boolean> {
+  try {
+    const json = await adminFetch(`/admin/materials/${id}`, token, {
+      method: 'DELETE',
+    });
+    return Boolean(json && json.success);
+  } catch (err) {
     return false;
   }
 }

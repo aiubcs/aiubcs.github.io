@@ -1,17 +1,19 @@
 import React from 'react';
-import { User, Mail, GraduationCap, Building2, Moon, Sun } from 'lucide-react';
+import { User, Mail, GraduationCap, Building2, Moon, Sun, ShieldCheck } from 'lucide-react';
 import { UserProfile } from '../data/mockData';
 
 interface ProfileViewProps {
   user: UserProfile;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
+  onOpenAdmin: () => void;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
   user,
   isDarkMode,
   onToggleDarkMode,
+  onOpenAdmin,
 }) => {
   return (
     <div className="pb-24 pt-1 space-y-4">
@@ -73,6 +75,25 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className={`w-10 h-5.5 flex items-center rounded-full p-0.5 transition-colors ${isDarkMode ? 'bg-emerald-600' : 'bg-slate-300'}`}>
             <div className={`bg-white w-4 h-4 rounded-full shadow-xs transform transition-transform ${isDarkMode ? 'translate-x-4.5' : ''}`} />
           </div>
+        </div>
+      </div>
+
+      {/* Admin Panel Entry */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+        <div
+          onClick={onOpenAdmin}
+          className="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+        >
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <ShieldCheck className="w-4.5 h-4.5" />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Admin Panel</span>
+              <p className="text-[10px] text-slate-400 font-medium">Manage announcements, materials & courses</p>
+            </div>
+          </div>
+          <span className="text-slate-300 dark:text-slate-600 text-sm">›</span>
         </div>
       </div>
     </div>

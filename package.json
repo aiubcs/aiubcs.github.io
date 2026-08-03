@@ -11,6 +11,8 @@
     "cf:deploy": "npm run build && wrangler deploy",
     "cf:d1:create": "wrangler d1 create aiubcs-db",
     "cf:d1:init": "wrangler d1 execute aiubcs-db --local --file=./schema.sql",
+    "cf:d1:migrate-admin": "wrangler d1 execute aiubcs-db --remote --file=./migrations/001-admin-auth.sql",
+    "cf:create-admin": "node scripts/create-admin.mjs",
     "cf:r2:create": "wrangler r2 bucket create aiubcs-materials"
   },
   "dependencies": {
