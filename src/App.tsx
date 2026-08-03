@@ -11,7 +11,7 @@ import { DocumentViewerModal } from './components/DocumentViewerModal';
 import { SyllabusModal } from './components/SyllabusModal';
 import { NotificationModal } from './components/NotificationModal';
 import { CURRENT_USER, COURSES, Course, MaterialItem } from './data/mockData';
-import { fetchMaterialsFromCloudflare } from './services/api';
+import { fetchMaterialsFromCloudflare, fetchCoursesFromCloudflare } from './services/api';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
@@ -22,13 +22,17 @@ export function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
+  const [courses, setCourses] = useState<Course[]>(COURSES);
   const [materials, setMaterials] = useState<MaterialItem[]>([]);
   const [savedMaterials, setSavedMaterials] = useState<MaterialItem[]>([]);
   const [downloadedMaterials, setDownloadedMaterials] = useState<MaterialItem[]>([]);
 
   useEffect(() => {
+    fetchCoursesFromCloudflare().then(data => {
+      if (data && data.length > 0) setCourses(data);
+    });
     fetchMaterialsFromCloudflare().then(data => {
-      setMaterials(data);
+      if (data) setMaterials(data);
     });
   }, []);
 
@@ -90,7 +94,10 @@ export function App() {
         <Navbar
           user={CURRENT_USER}
           onOpenNotifications={() => setShowNotifications(true)}
-          onOpenProfile={() => setActiveTab('profile')}
+          onOpenProfile={() => {
+            setSelectedCourse(null);
+            setActiveTab('profile');
+          }}
         />
 
         {/* Main Body */}
@@ -111,17 +118,20 @@ export function App() {
                   onSelectCourse={handleSelectCourse}
                   onSelectMaterial={(material) => setSelectedMaterial(material)}
                   onNavigateTab={(tab) => {
-                    if (tab === 'courses') setSelectedCourse(COURSES[0]);
-                    else setActiveTab(tab);
+                    setSelectedCourse(null);
+                    setActiveTab(tab);
                   }}
                   onSearchQuery={(q) => {
-                    if (q) setSelectedCourse(COURSES[0]);
+                    if (q) {
+                      setSelectedCourse(null);
+                      setActiveTab('courses');
+                    }
                   }}
                 />
               )}
 
               {activeTab === 'courses' && (
-                <CoursesView onSelectCourse={handleSelectCourse} />
+                <CoursesView courses={courses} onSelectCourse={handleSelectCourse} />
               )}
 
               {activeTab === 'saved' && (

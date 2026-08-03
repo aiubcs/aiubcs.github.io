@@ -3,10 +3,11 @@ import { BookOpen, Database, Code2, Network, Cpu, ChevronRight, Search, Sparkles
 import { COURSES, Course } from '../data/mockData';
 
 interface CoursesViewProps {
+  courses?: Course[];
   onSelectCourse: (course: Course) => void;
 }
 
-export const CoursesView: React.FC<CoursesViewProps> = ({ onSelectCourse }) => {
+export const CoursesView: React.FC<CoursesViewProps> = ({ courses = COURSES, onSelectCourse }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
@@ -20,7 +21,7 @@ export const CoursesView: React.FC<CoursesViewProps> = ({ onSelectCourse }) => {
     'General & Business'
   ];
 
-  const filteredCourses = COURSES.filter(course => {
+  const filteredCourses = courses.filter(course => {
     const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory;
     const matchesSearch = course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           course.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -53,7 +54,7 @@ export const CoursesView: React.FC<CoursesViewProps> = ({ onSelectCourse }) => {
         </div>
         <div>
           <h1 className="text-base font-black text-slate-900 dark:text-white">AIUB CS Course Catalog</h1>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400">Complete curriculum ({COURSES.length} courses)</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">Complete curriculum ({courses.length} courses)</p>
         </div>
       </div>
 
