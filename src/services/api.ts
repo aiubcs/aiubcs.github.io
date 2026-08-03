@@ -8,8 +8,8 @@ export async function fetchCoursesFromCloudflare(): Promise<Course[]> {
   try {
     const res = await fetch(`${API_BASE}/courses`);
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    const json = await res.json();
-    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+    const json: any = await res.json();
+    if (json && json.success && Array.isArray(json.data) && json.data.length > 0) {
       return json.data.map((c: any) => ({
         id: c.id,
         code: c.code,
@@ -42,8 +42,8 @@ export async function fetchMaterialsFromCloudflare(courseId?: string, category?:
 
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    const json = await res.json();
-    if (json.success && Array.isArray(json.data)) {
+    const json: any = await res.json();
+    if (json && json.success && Array.isArray(json.data)) {
       return json.data;
     }
   } catch (err) {
@@ -64,8 +64,8 @@ export async function uploadMaterialToCloudflareR2(file: File, courseCode: strin
       method: 'POST',
       body: formData,
     });
-    const json = await res.json();
-    return json.success;
+    const json: any = await res.json();
+    return Boolean(json && json.success);
   } catch (err) {
     console.error('Failed to upload to Cloudflare R2:', err);
     return false;
